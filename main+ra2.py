@@ -5,13 +5,17 @@ from bayesian_opt import BayesianOptimization
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # Number of time steps = 1000000
 # Target Offset set to 0.03m
 # Target backfill_permeability set to 6.1728E-13
-def calculate_rayleigh_number(delta_T, k, D=0.5, alpha=2.054e-7, mu=1.00e-3, g=9.81, rhow=980, beta=8.80e-05):
+def calculate_rayleigh_number(
+    delta_T, k, D=0.5, alpha=2.054e-7, mu=1.00e-3, g=9.81, rhow=980, beta=8.80e-05
+):
     """Calculate the Rayleigh number based on provided parameters."""
     Ra = (rhow * g * D * k * beta * delta_T) / (mu * alpha)
     return Ra
+
 
 def offset_bayes_opt(soil_properties, backfill_properties, ntime_steps):
     # Target offset between the cables in meters
@@ -128,7 +132,7 @@ def plot_rayleigh_contours(offsets, permeabilities):
     for i, perm in enumerate(permeabilities):
         for j, offset in enumerate(offsets):
             Ra_grid[i, j] = calculate_rayleigh_number(delta_T, perm)
-    
+
     plt.figure(figsize=(10, 6))
     X, Y = np.meshgrid(offsets, permeabilities)
     cont = plt.contourf(X, Y, Ra_grid, levels=50, cmap="RdBu")
@@ -136,10 +140,11 @@ def plot_rayleigh_contours(offsets, permeabilities):
     plt.xlabel("Offset (m)")
     plt.ylabel("Permeability (m^2)")
     plt.title("Rayleigh Number Across Different Offsets and Permeabilities")
-    plt.yscale('log')
+    plt.yscale("log")
     plt.tight_layout()
     plt.savefig("rayleigh_contours.png")
     print("Plot saved as rayleigh_contours.png")
+
 
 if __name__ == "__main__":
     ntime_steps = 1000000
@@ -169,7 +174,7 @@ if __name__ == "__main__":
 
     if args.optimize == "offset":
         offset_bayes_opt(soil_properties, backfill_properties, ntime_steps)
-        
+
     elif args.optimize == "permeability":
         permeability_bayes_opt(soil_properties, backfill_properties, ntime_steps)
 
@@ -190,4 +195,3 @@ if __name__ == "__main__":
     offsets = np.linspace(0.025, 0.05, 50)  # Example range of offsets
     permeabilities = np.logspace(-16, -8, 50)  # Example range of permeabilities
     plot_rayleigh_contours(offsets, permeabilities)
-
